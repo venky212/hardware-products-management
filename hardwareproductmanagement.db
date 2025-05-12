@@ -1,0 +1,73 @@
+-- Table to store suppliers
+CREATE TABLE Suppliers (
+    SupplierID INT PRIMARY KEY,
+    Name VARCHAR(100),
+    ContactInfo VARCHAR(255)
+);
+
+-- Table to store products
+CREATE TABLE Products (
+    ProductID INT PRIMARY KEY,
+    Name VARCHAR(100),
+    SupplierID INT,
+    Category VARCHAR(50),
+    Price DECIMAL(10,2),
+    Stock INT,
+    FOREIGN KEY (SupplierID) REFERENCES Suppliers(SupplierID)
+);
+
+-- Table to store customers
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY,
+    FullName VARCHAR(100),
+    JoinDate DATE
+);
+
+-- Table to record purchases
+CREATE TABLE PurchaseRecords (
+    RecordID INT PRIMARY KEY,
+    CustomerID INT,
+    ProductID INT,
+    PurchaseDate DATE,
+    Quantity INT,
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
+-- Sample data inserts
+INSERT INTO Suppliers VALUES 
+(1, 'Acme Tools', 'acme@example.com'), 
+(2, 'Bolt & Nut Co.', 'bnc@example.com');
+
+INSERT INTO Products VALUES 
+(201, 'Electric Drill', 1, 'Power Tools', 89.99, 10),
+(202, 'Hammer', 2, 'Hand Tools', 15.50, 25),
+(203, 'Screwdriver Set', 2, 'Hand Tools', 20.00, 18);
+
+INSERT INTO Customers VALUES 
+(1, 'Charlie Brown', '2024-11-01'),
+(2, 'Daisy Adams', '2025-01-20');
+
+INSERT INTO PurchaseRecords VALUES 
+(1, 1, 201, '2025-02-10', 1),
+(2, 2, 203, '2025-03-05', 2);
+
+-- Query: Show all products with supplier names
+SELECT p.Name AS Product, s.Name AS Supplier, p.Stock 
+FROM Products p
+JOIN Suppliers s ON p.SupplierID = s.SupplierID;
+
+-- Query: Purchase history
+SELECT c.FullName, pr.PurchaseDate, pd.Name AS Product, pr.Quantity
+FROM PurchaseRecords pr
+JOIN Customers c ON pr.CustomerID = c.CustomerID
+JOIN Products pd ON pr.ProductID = pd.ProductID;
+
+-- Query: Available products in stock
+SELECT Name FROM Products WHERE Stock > 0;
+
+-- Update stock after purchase
+UPDATE Products SET Stock = Stock - 1 WHERE ProductID = 202;
+
+-- Delete a purchase record
+DELETE FROM PurchaseRecords WHERE RecordID = 1;
